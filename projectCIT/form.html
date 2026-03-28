@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>กรอกข้อมูล</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Sarabun&display=swap" rel="stylesheet">
+
+<style>
+body{
+  font-family:'Sarabun',sans-serif;
+  background: linear-gradient(135deg,#6366f1,#0ea5e9);
+  margin:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.card{
+  background:white;
+  padding:25px;
+  border-radius:20px;
+  width:450px;
+  max-height:90vh;
+  overflow:auto;
+}
+
+h2{ text-align:center; }
+
+input, select{
+  width:95%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+button{
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:#6366f1;
+  color:white;
+  margin-top:10px;
+  cursor:pointer;
+  width:100%;
+}
+
+.add-btn{
+  background:#10b981;
+}
+
+.remove-btn{
+  background:#ef4444;
+  margin-top:5px;
+}
+
+.section{
+  margin-top:15px;
+  border-top:1px solid #eee;
+  padding-top:10px;
+  
+}
+input[type="date"],
+input[type="time"]{
+  appearance: none;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+<h2>กรอกข้อมูลแบบคำร้องขอสอบโครงงาน 1/2
+</h2>
+
+<!-- 👩‍🎓 นักศึกษา -->
+<div class="section">
+<h3>ข้อมูลนักศึกษา</h3>
+<div id="students"></div>
+<button class="add-btn" onclick="addStudent()">+ เพิ่มนักศึกษา</button>
+</div>
+
+<!-- 🎓 สาขา -->
+<div class="section">
+<h3>สาขาวิชา</h3>
+<select id="major">
+  <option>สาขาวิชาคอมพิวเตอร์และเทคโนโลยีสารสนเทศ</option>
+  <option>สาขาวิชาเทคโนโลยีมัลติมีเดียและแอนิเมชัน</option>
+  <option>สาขาวิชาวิทยาการคอมพิวเตอร์</option>
+</select>
+<input id="phone" placeholder="เบอร์โทร">
+</div>
+
+<!-- 💡 โครงงาน -->
+<div class="section">
+<h3>โครงงาน</h3>
+<input id="project" placeholder="ชื่อโครงงาน">
+</div>
+
+<!-- 👨‍🏫 อาจารย์ -->
+<div class="section">
+<h3>อาจารย์ที่ปรึกษา</h3>
+<input id="advisor" placeholder="ชื่ออาจารย์">
+</div>
+
+<!-- 🧑‍⚖️ กรรมการ -->
+<div class="section">
+<h3>กรรมการสอบ</h3>
+<div id="committee"></div>
+<button class="add-btn" onclick="addCommittee()">+ เพิ่มกรรมการ</button>
+</div>
+
+<!-- 📅 วันสอบ -->
+<div class="section">
+    <h3>กำหนดการสอบ</h3>
+  
+    <!-- เลือกวันที่ (มีปฏิทินเด้ง) -->
+    <input type="date" id="exam_date">
+  
+    <!-- เวลา (มีตัวเลือกเวลาอัตโนมัติ) -->
+    <input type="time" id="time">
+  
+  </div>
+
+<!-- ✍️ ลงชื่อ -->
+<div class="section">
+<h3>ลงชื่อ</h3>
+<input id="sign" placeholder="ชื่อผู้ยื่นคำร้อง">
+<input type="date" id="submit_date">
+</div>
+
+<button onclick="go()">ไปหน้า PDF</button>
+
+</div>
+
+<script>
+// 🔥 เพิ่มนักศึกษา
+function addStudent(){
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <input placeholder="ชื่อ-นามสกุล" class="name">
+    <input placeholder="รหัสนักศึกษา" class="sid">
+    <input placeholder="ปี" class="year">
+    <button class="remove-btn" onclick="this.parentElement.remove()">ลบ</button>
+  `;
+  document.getElementById('students').appendChild(div);
+}
+
+// 🔥 เพิ่มกรรมการ
+function addCommittee(){
+  const div = document.createElement('div');
+  div.innerHTML = `
+    <input placeholder="ชื่อกรรมการ" class="com">
+    <button class="remove-btn" onclick="this.parentElement.remove()">ลบ</button>
+  `;
+  document.getElementById('committee').appendChild(div);
+}
+
+// 🚀 ส่งข้อมูลไป pdf
+function go(){
+  const students = document.querySelectorAll('#students > div');
+  const committees = document.querySelectorAll('#committee .com');
+
+  const data = {
+    students: [],
+    committees: [],
+    major: major.value,
+    phone: phone.value,
+    project: project.value,
+    advisor: advisor.value,
+    date: document.getElementById('exam_date').value, // ✅ แก้
+    time: time.value,
+    sign: sign.value,
+    submit_date: document.getElementById('submit_date').value // ✅ ใช้ตัวเดียวพอ
+  };
+
+  students.forEach((s)=>{
+    const inputs = s.querySelectorAll('input');
+    data.students.push({
+      name: inputs[0].value,
+      sid: inputs[1].value,
+      year: inputs[2].value
+    });
+  });
+
+  committees.forEach(c=>{
+    data.committees.push(c.value);
+  });
+
+  localStorage.setItem('formData', JSON.stringify(data));
+
+  // debug กันพลาด
+  console.log(data);
+
+  window.location.href = 'pdf.html';
+}
+
+// เริ่มต้นมี 1 ช่อง
+addStudent();
+addCommittee();
+</script>
+
+</body>
+</html>
